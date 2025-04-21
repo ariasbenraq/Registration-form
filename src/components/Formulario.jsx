@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 import { validarFormulario, formatearDatos } from '../utils/validaciones';
-import { enviarRegistro } from '../services/registroService';
+import { enviarRegistro } from '../services/apiService';
+import AutoInput from './AutoInput'; // ajusta la ruta si estás en /components o /formulario
+
 
 const Formulario = () => {
   const [formData, setFormData] = useState({
@@ -57,26 +59,20 @@ const Formulario = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="mb-3">
-        <label className="form-label">Sede</label>
-        <input
-          type="text"
-          name="sede"
-          className="form-control"
-          value={formData.sede}
-          onChange={handleChange}
-        />
-      </div>
-      <div className="mb-3">
-        <label className="form-label">Proyecto</label>
-        <input
-          type="text"
-          name="proyecto"
-          className="form-control"
-          value={formData.proyecto}
-          onChange={handleChange}
-        />
-      </div>
+      <AutoInput
+        label="Sede"
+        name="sede"
+        value={formData.sede}
+        onChange={handleChange}
+        endpoint="sedes"
+      />
+      <AutoInput
+        label="Proyecto"
+        name="proyecto"
+        value={formData.proyecto}
+        onChange={handleChange}
+        endpoint="proyectos"
+      />
       <div className="mb-3">
         <label className="form-label">Puerto del Switch</label>
         <input
@@ -100,7 +96,7 @@ const Formulario = () => {
       <button type="submit" className="btn btn-primary w-100">Enviar</button>
     </form>
   );
-  
+
 };
 
 export default Formulario;
