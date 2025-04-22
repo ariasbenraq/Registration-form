@@ -1,44 +1,56 @@
 import { useEffect, useState } from 'react';
+import Select from 'react-select';
 import { fetchOpcionesFiltrado } from '../services/apiService';
 
 const AutoInput = ({ label, name, value, onChange, endpoint, placeholder = '' }) => {
-    const [opciones, setOpciones] = useState([]);
+  const [opciones, setOpciones] = useState([]);
+  const [inputValue, setInputValue] = useState('');
 
-    const handleSearch = async (texto) => {
-        if (texto.length >= 2) { // 🔥 Cambia la cantidad mínima de letras si deseas
-            const resultados = await fetchOpcionesFiltrado(endpoint, texto);
-            setOpciones(resultados);
-        } else {
-            setOpciones([]); // Si no hay mínimo, no mostrar opciones
+  // 🟢 Manejar la búsqueda dinámica (lazy loading)
+  const handleSearch = async (input) => {
+    if (input.length >= 2) {
+      const resultados = await fetchOpcionesFiltrado(endpoint, input);
+      setOpciones(resultados.map(op => ({ value: op, label: op })));
+    } else {
+      setOpciones([]); // Limpiar opciones si no hay búsqueda
+    }
+  };
+
+  useEffect(() => {
+    handleSearch(value); // Si hay valor cargado, busca las opciones iniciales
+  }, [value]);
+
+  return (
+    <div className="mb-3">
+      <label className="form-label">{label}</label>
+      <Select
+        options={opciones}
+        value={value ? { value, label: value } : null}
+        onChange={(selected) =>
+          onChange({ target: { name, value: selected ? selected.value : '' } })
         }
-    };
-
-    useEffect(() => {
-        handleSearch(value);
-    }, [value]); // Cada vez que escribe, se dispara
-
-    return (
-        <div className="mb-3">
-            <label className="form-label" htmlFor={`input-${name}`}>{label}</label>
-            <input
-                list={`lista-${name}`}
-                id={`input-${name}`}
-                type="text"
-                name={name}
-                className="form-control"
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                onInput={(e) => handleSearch(e.target.value)} // 🔥 Busca mientras escribe
-            />
-            <datalist id={`lista-${name}`}>
-                {(Array.isArray(opciones) ? opciones : []).map((op, i) => (
-                    <option key={i} value={op} />
-                ))}
-
-            </datalist>
-        </div>
-    );
+        onInputChange={(input) => {
+          setInputValue(input);
+          handleSearch(input);
+        }}
+        placeholder={placeholder || `Selecciona ${label}`}
+        isClearable
+        noOptionsMessage={() => 'Escribe al menos 2 letras...'}
+        styles={{
+          control: (provided) => ({
+            ...provided,
+            borderRadius: '8px',
+            padding: '2px',
+          }),
+          option: (provided, state) => ({
+            ...provided,
+            backgroundColor: state.isSelected ? '#0d6efd' : state.isFocused ? '#e7f1ff' : undefined,
+            color: state.isSelected ? 'white' : 'black',
+          }),
+        }}
+      />
+    </div>
+  );
 };
 
 export default AutoInput;
