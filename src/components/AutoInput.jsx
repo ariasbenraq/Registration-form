@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
-import { fetchOpciones } from '../services/apiService';
+import { fetchOpcionesFiltrado } from '../services/apiService';
 
 const AutoInput = ({ label, name, value, onChange, endpoint, placeholder = '' }) => {
     const [opciones, setOpciones] = useState([]);
 
+    const handleSearch = async (texto) => {
+        if (texto.length >= 2) { // 🔥 Cambia la cantidad mínima de letras si deseas
+            const resultados = await fetchOpcionesFiltrado(endpoint, texto);
+            setOpciones(resultados);
+        } else {
+            setOpciones([]); // Si no hay mínimo, no mostrar opciones
+        }
+    };
+
     useEffect(() => {
-        fetchOpciones(endpoint)
-            .then((res) => {
-                console.log(`Opciones cargadas desde /${endpoint}:`, res);
-                setOpciones(res);
-            })
-            .catch(err => console.error(`Error cargando ${endpoint}:`, err));
-    }, [endpoint]);
+        handleSearch(value);
+    }, [value]); // Cada vez que escribe, se dispara
 
     return (
         <div className="mb-3">
@@ -25,13 +29,14 @@ const AutoInput = ({ label, name, value, onChange, endpoint, placeholder = '' })
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
+                onInput={(e) => handleSearch(e.target.value)} // 🔥 Busca mientras escribe
             />
             <datalist id={`lista-${name}`}>
                 {(Array.isArray(opciones) ? opciones : []).map((op, i) => (
                     <option key={i} value={op} />
                 ))}
-            </datalist>
 
+            </datalist>
         </div>
     );
 };
