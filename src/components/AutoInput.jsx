@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { fetchOpcionesFiltrado } from '../services/apiService';
 
 const AutoInput = ({ label, name, value, onChange, endpoint, placeholder = '' }) => {
@@ -23,7 +23,7 @@ const AutoInput = ({ label, name, value, onChange, endpoint, placeholder = '' })
   return (
     <div className="mb-3">
       <label className="form-label">{label}</label>
-      <Select
+      <CreatableSelect
         options={opciones}
         value={value ? { value, label: value } : null}
         onChange={(selected) =>
@@ -33,9 +33,9 @@ const AutoInput = ({ label, name, value, onChange, endpoint, placeholder = '' })
           setInputValue(input);
           handleSearch(input);
         }}
-        placeholder={placeholder || `Selecciona ${label}`}
+        placeholder={placeholder || `Selecciona o crea ${label}`}
         isClearable
-        noOptionsMessage={() => 'Escribe al menos 2 letras...'}
+        noOptionsMessage={() => 'Escribe al menos 2 letras o crea uno nuevo...'}
         styles={{
           control: (provided) => ({
             ...provided,
@@ -48,6 +48,10 @@ const AutoInput = ({ label, name, value, onChange, endpoint, placeholder = '' })
             color: state.isSelected ? 'white' : 'black',
           }),
         }}
+        formatCreateLabel={(inputValue) => `Registrar nuevo: "${inputValue}"`}
+        isValidNewOption={(inputValue, _, options) =>
+          inputValue && !options.some(option => option.value.toLowerCase() === inputValue.toLowerCase())
+        }
       />
     </div>
   );
