@@ -1,31 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import {
-  validarFormulario,
-  formatearDatos,
-  formatearTitulo,
-  buscarCoincidenciasLevenshtein,
-  normalizarTexto
-} from '../utils/validaciones';
-
+import { validarFormulario, formatearDatos, formatearTitulo } from '../utils/validaciones';
 import { enviarRegistro, agregarSede, agregarProyecto, fetchOpciones } from '../services/apiService';
 import AutoInput from './AutoInput';
+import SubmitButton from './SubmitButton';
+import PuertoEtiquetaGroup from './PuertoEtiquetaGroup'
+
 
 const Formulario = () => {
-  const [errores, setErrores] = useState({
-    sede: '',
-    proyecto: '',
-  });
-
-  const [formData, setFormData] = useState({
-    sede: '',
-    proyecto: '',
-    puerto: '',
-    etiqueta: '',
-  });
-
+  const [errores, setErrores] = useState({ sede: '', proyecto: '' });
+  const [formData, setFormData] = useState({ sede: '', proyecto: '', puerto: '', etiqueta: '' });
+  const [sedesCache, setSedesCache] = useState([]);
+  const [proyectosCache, setProyectosCache] = useState([]);
   const [refreshCounter, setRefreshCounter] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pares, setPares] = useState([{ puerto: '', etiqueta: '' }]);
 
+
+
+  // 🟢 Cargar Sedes y Proyectos solo una vez al montar el componente:
+  useEffect(() => {
+    const cargarOpciones = async () => {
+      const sedes = await fetchOpciones('sedes');
+      const proyectos = await fetchOpciones('proyectos');
+      setSedesCache(sedes);
+      setProyectosCache(proyectos);
+    };
+    cargarOpciones();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,120 +53,44 @@ const Formulario = () => {
     });
   };
 
+  const handlePairChange = (index, field, value) => {
+    const nuevosPares = [...pares];
+    nuevosPares[index][field] = value;
+    setPares(nuevosPares);
+  };
+
+  const handleAddPair = () => {
+    setPares([...pares, { puerto: '', etiqueta: '' }]);
+  };
+
+  const handleRemovePair = (index) => {
+    const nuevosPares = pares.filter((_, i) => i !== index);
+    setPares(nuevosPares);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setIsSubmitting(true); // ⬅️ Activa el "pending"
+
     const resultadoValidacion = validarFormulario(formData);
     if (!resultadoValidacion.valido) {
       Swal.fire('Error', resultadoValidacion.mensaje, 'warning');
+      setIsSubmitting(false); // ⬅️ Desactiva si hubo error
       return;
     }
 
-    // 🟢 FORMATEAMOS SEDE Y PROYECTO
+    // 🟢 Formateo para el resumen:
     const sedeFormateada = formatearTitulo(formData.sede);
     const proyectoFormateado = formatearTitulo(formData.proyecto);
-
     const datosFormateados = {
       ...formatearDatos(formData),
       sede: sedeFormateada,
-      proyecto: proyectoFormateado
+      proyecto: proyectoFormateado,
+      pares: pares // ⬅️ Ahora mandas el array de pares
     };
 
-    const sedes = await fetchOpciones('sedes');
-    const proyectos = await fetchOpciones('proyectos');
-
-    const sedeExiste = sedes.some((s) => normalizarTexto(s) === normalizarTexto(sedeFormateada));
-    const proyectoExiste = proyectos.some((p) => normalizarTexto(p) === normalizarTexto(proyectoFormateado));
-
-    const buscarCoincidencias = (lista, valor) => {
-      const valorPalabras = normalizarTexto(valor).split(' ').filter(p => p);
-      return lista.filter(item => {
-        const itemPalabras = normalizarTexto(item).split(' ').filter(p => p);
-        return valorPalabras.some(palabra => itemPalabras.includes(palabra));
-      });
-    };
-
-    // 🟢 VALIDACIÓN DE SEDE
-    try {
-      if (!sedeExiste) {
-        const coincidencias = buscarCoincidenciasLevenshtein(sedes, sedeFormateada);
-
-        if (coincidencias.length > 0) {
-          const advertencia = await Swal.fire({
-            title: '⚠️ Coincidencia detectada',
-            html: `
-              <p>La sede <strong>"${sedeFormateada}"</strong> es muy similar a una o varias registradas:</p>
-              <ul style="text-align: left;">
-                ${coincidencias.map(c => `<li>${c}</li>`).join('')}
-              </ul>
-              <p>¿Estás seguro de que deseas registrarla de todas maneras?</p>
-            `,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, registrar igual',
-            cancelButtonText: 'Cancelar'
-          });
-
-          if (!advertencia.isConfirmed) {
-            return; // 🚫 Detiene si el usuario no confirma
-          }
-        }
-
-        await agregarSede(sedeFormateada); // ✅ Solo registra si acepta
-      }
-    } catch (error) {
-      const mensajeError = error.message || 'Ocurrió un error al intentar registrar la sede.';
-      await Swal.fire({
-        title: '⚠️ Sede duplicada',
-        text: mensajeError,
-        icon: 'warning',
-        confirmButtonText: 'Entendido',
-      });
-      return; // 🚫 Detiene el flujo
-    }
-
-    // 🟠 VALIDACIÓN DE PROYECTO
-    try {
-      if (!proyectoExiste) {
-        const coincidenciasProyecto = buscarCoincidenciasLevenshtein(proyectos, proyectoFormateado, 3);
-
-        if (coincidenciasProyecto.length > 0) {
-          const advertenciaProyecto = await Swal.fire({
-            title: '⚠️ Coincidencia de proyecto detectada',
-            html: `
-              <p>El proyecto <strong>"${proyectoFormateado}"</strong> es muy similar a uno o varios registrados:</p>
-              <ul style="text-align: left;">
-                ${coincidenciasProyecto.map(p => `<li>${p}</li>`).join('')}
-              </ul>
-              <p>¿Deseas registrarlo de todas maneras?</p>
-            `,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, registrar igual',
-            cancelButtonText: 'Cancelar'
-          });
-
-          if (!advertenciaProyecto.isConfirmed) {
-            return; // 🚫 Detiene si el usuario no confirma
-          }
-        }
-
-        await agregarProyecto(proyectoFormateado); // ✅ Solo registra si acepta
-      }
-    } catch (error) {
-      const mensajeError = error.message || 'Ocurrió un error al intentar registrar el proyecto.';
-      await Swal.fire({
-        title: '⚠️ Proyecto duplicado',
-        text: mensajeError,
-        icon: 'warning',
-        confirmButtonText: 'Entendido',
-      });
-      return; // 🚫 Detiene si hay error del backend
-    }
-
-
-    // ✅ CONFIRMACIÓN FINAL PARA EL ENVÍO DE TODO EL REGISTRO:
+    // 🚀 1️⃣ Mostrar el resumen ANTES de validar duplicados:
     const confirmacion = await Swal.fire({
       title: '¿Estás seguro?',
       html: `
@@ -179,18 +105,76 @@ const Formulario = () => {
       cancelButtonText: 'Cancelar',
     });
 
-    if (!confirmacion.isConfirmed) return;
+    if (!confirmacion.isConfirmed) {
+      setIsSubmitting(false); // ⬅️ Desactiva si se cancela
+      return;
+    }
 
-    // 🚀 ENVÍO FINAL
+
+    // 🚀 2️⃣ Validación de existencia (después del resumen):
+    const sedeExiste = sedesCache.some((s) => normalizarTexto(s) === normalizarTexto(sedeFormateada));
+    const proyectoExiste = proyectosCache.some((p) => normalizarTexto(p) === normalizarTexto(proyectoFormateado));
+
+    // 🟡 Si la sede no existe:
+    if (!sedeExiste) {
+      const coincidencias = buscarCoincidencias(sedesCache, sedeFormateada);
+      if (coincidencias.length > 0) {
+        const confirmSimilar = await Swal.fire({
+          title: '⚠️ Coincidencia detectada',
+          html: `
+            <p>Ya existe una sede similar:</p>
+            <ul>${coincidencias.map(c => `<li>${c}</li>`).join('')}</ul>
+            <p>¿Deseas registrar <strong>"${sedeFormateada}"</strong> de todos modos?</p>
+          `,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, registrar igual',
+          cancelButtonText: 'Cancelar',
+        });
+        if (!confirmSimilar.isConfirmed) return;
+      }
+      await agregarSede(sedeFormateada);
+      // Actualiza la cache:
+      const nuevasSedes = await fetchOpciones('sedes');
+      setSedesCache(nuevasSedes);
+    }
+
+    // 🟡 Si el proyecto no existe:
+    if (!proyectoExiste) {
+      const coincidenciasProyecto = buscarCoincidencias(proyectosCache, proyectoFormateado);
+      if (coincidenciasProyecto.length > 0) {
+        const confirmProyecto = await Swal.fire({
+          title: '⚠️ Proyecto similar detectado',
+          html: `
+            <p>Ya existe un proyecto similar:</p>
+            <ul>${coincidenciasProyecto.map(p => `<li>${p}</li>`).join('')}</ul>
+            <p>¿Deseas registrar <strong>"${proyectoFormateado}"</strong> de todos modos?</p>
+          `,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Sí, registrar igual',
+          cancelButtonText: 'Cancelar',
+        });
+        if (!confirmProyecto.isConfirmed) return;
+      }
+      await agregarProyecto(proyectoFormateado);
+      // Actualiza la cache:
+      const nuevosProyectos = await fetchOpciones('proyectos');
+      setProyectosCache(nuevosProyectos);
+    }
+
+    // ✅ 🚀 Si todo OK, recién registra:
     try {
       await enviarRegistro(datosFormateados);
       Swal.fire('¡Éxito!', 'Información enviada correctamente.', 'success');
       setFormData({ sede: '', proyecto: '', puerto: '', etiqueta: '' });
-      setRefreshCounter((prev) => prev + 1); // 🔥 Esto refresca las opciones del formulario
     } catch (error) {
       Swal.fire('Error', 'No se pudo registrar la información.', 'error');
+    } finally {
+      setIsSubmitting(false); // ⬅️ Siempre desactiva al final
     }
   };
+
 
 
   return (
@@ -204,7 +188,6 @@ const Formulario = () => {
         refresh={refreshCounter}
       />
       {errores.sede && <div style={{ color: 'red' }}>{errores.sede}</div>}
-
       <AutoInput
         label="Proyecto"
         name="proyecto"
@@ -215,29 +198,49 @@ const Formulario = () => {
       />
       {errores.proyecto && <div style={{ color: 'red' }}>{errores.proyecto}</div>}
 
-      <div className="mb-3">
-        <label className="form-label">Puerto del Switch</label>
-        <input
-          type="text"
-          name="puerto"
-          className="form-control"
-          value={formData.puerto}
-          onChange={handleChange}
-          refresh={refreshCounter}
-        />
+      {/* <h5 className="mt-4">Puertos y Etiquetas</h5> */}
+      <div className='row'>
+        <div className="col-md-6 mb-3">
+          <label className="form-label">Puerto del Switch</label>
+          <input
+            type="text"
+            name="puerto"
+            className="form-control"
+            placeholder="ej. 101"
+            value={formData.puerto}
+            onChange={handleChange}
+            refresh={refreshCounter}
+          />
+        </div>
+        <div className="col-md-6 mb-3">
+          <label className="form-label">Etiqueta del Faceplate</label>
+          <input
+            type="text"
+            name="etiqueta"
+            className="form-control"
+            placeholder="ej. ppa18"
+            value={formData.etiqueta}
+            onChange={handleChange}
+            refresh={refreshCounter}
+          />
+        </div>
       </div>
-      <div className="mb-3">
-        <label className="form-label">Etiqueta del Faceplate</label>
-        <input
-          type="text"
-          name="etiqueta"
-          className="form-control"
-          value={formData.etiqueta}
-          onChange={handleChange}
-          refresh={refreshCounter}
+      {/*       
+      {pares.map((pair, index) => (
+        <PuertoEtiquetaGroup
+          key={index}
+          index={index}
+          pair={pair}
+          handlePairChange={handlePairChange}
+          handleRemove={handleRemovePair}
         />
-      </div>
-      <button type="submit" className="btn btn-primary w-100">Enviar</button>
+      ))} */}
+      {/* <div className="col-md-6 mb-3">
+        <button type="button" className="btn btn-secondary" onClick={handleAddPair}>
+          ➕ Agregar otro par de Puerto y Etiqueta
+        </button>
+      </div> */}
+      <SubmitButton isSubmitting={isSubmitting} />
     </form>
   );
 };
