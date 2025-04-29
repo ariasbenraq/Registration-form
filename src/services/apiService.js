@@ -6,11 +6,11 @@ export async function fetchOpciones(endpoint) {
     return Array.isArray(data) ? data : data[endpoint];
 }
 
-export async function agregarSede(sede) {
+export async function agregarSede(sede, force = false) {
     const response = await fetch(`${BASE_URL}/sedes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sede }),
+        body: JSON.stringify({ sede, force }),
     });
 
     if (!response.ok) {
@@ -20,13 +20,20 @@ export async function agregarSede(sede) {
 }
 
 
-export async function agregarProyecto(proyecto) {
-    await fetch(`${BASE_URL}/proyectos`, {
+export async function agregarProyecto(proyecto, force = false) {
+    const response = await fetch(`${BASE_URL}/proyectos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ proyecto }),
+        body: JSON.stringify({ proyecto, force }),
     });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al agregar el proyecto');
+    }
 }
+
+
 
 export async function enviarRegistro(data) {
     await fetch(`${BASE_URL}/registro`, {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { validarFormulario, formatearDatos, formatearTitulo } from '../utils/validaciones';
+import { validarFormulario, formatearDatos, formatearTitulo, buscarCoincidenciasLevenshtein } from '../utils/validaciones';
 import { enviarRegistro, agregarSede, agregarProyecto, fetchOpciones } from '../services/apiService';
 import AutoInput from './AutoInput';
 import SubmitButton from './SubmitButton';
@@ -117,23 +117,36 @@ const Formulario = () => {
 
     // 🟡 Si la sede no existe:
     if (!sedeExiste) {
-      const coincidencias = buscarCoincidencias(sedesCache, sedeFormateada);
+      const coincidencias = buscarCoincidenciasLevenshtein(sedesCache, sedeFormateada);
+      let force = false
+
       if (coincidencias.length > 0) {
         const confirmSimilar = await Swal.fire({
           title: '⚠️ Coincidencia detectada',
           html: `
-            <p>Ya existe una sede similar:</p>
-            <ul>${coincidencias.map(c => `<li>${c}</li>`).join('')}</ul>
-            <p>¿Deseas registrar <strong>"${sedeFormateada}"</strong> de todos modos?</p>
+            <div style="text-align: center; font-size: 16px;">
+              <p style="margin-bottom: 8px;">
+                <strong>⚠️ Ya existe una sede similar:</strong>
+              </p>
+              <div style="background-color: #f8f9fa; padding: 10px 15px; border-radius: 8px; border: 1px solid #dee2e6; margin-bottom: 15px;">
+                ${coincidencias.map(c => `<div style="margin: 5px 0; padding-left: 10px;">• ${c}</div>`).join('')}
+              </div>
+              <p>¿Deseas registrar <strong>"${sedeFormateada}"</strong> de todos modos?</p>
+            </div>
           `,
+
           icon: 'warning',
           showCancelButton: true,
           confirmButtonText: 'Sí, registrar igual',
           cancelButtonText: 'Cancelar',
         });
-        if (!confirmSimilar.isConfirmed) return;
+        if (!confirmSimilar.isConfirmed) {
+          setIsSubmitting(false);
+        return;
+        }
+        force = true; 
       }
-      await agregarSede(sedeFormateada);
+      await agregarSede(sedeFormateada, force);
       // Actualiza la cache:
       const nuevasSedes = await fetchOpciones('sedes');
       setSedesCache(nuevasSedes);
@@ -141,27 +154,43 @@ const Formulario = () => {
 
     // 🟡 Si el proyecto no existe:
     if (!proyectoExiste) {
-      const coincidenciasProyecto = buscarCoincidencias(proyectosCache, proyectoFormateado);
+      const coincidenciasProyecto = buscarCoincidenciasLevenshtein(proyectosCache, proyectoFormateado);
+      let force = false;
+
       if (coincidenciasProyecto.length > 0) {
         const confirmProyecto = await Swal.fire({
           title: '⚠️ Proyecto similar detectado',
           html: `
-            <p>Ya existe un proyecto similar:</p>
-            <ul>${coincidenciasProyecto.map(p => `<li>${p}</li>`).join('')}</ul>
-            <p>¿Deseas registrar <strong>"${proyectoFormateado}"</strong> de todos modos?</p>
-          `,
+                <div style="text-align: center; font-size: 16px;">
+                  <p style="margin-bottom: 8px;">
+                    <strong>⚠️ Ya existe un proyecto similar:</strong>
+                  </p>
+                  <div style="background-color: #f8f9fa; padding: 10px 15px; border-radius: 8px; border: 1px solid #dee2e6; margin-bottom: 15px;">
+                    ${coincidenciasProyecto.map(p => `<div style="margin: 5px 0; padding-left: 10px;">• ${p}</div>`).join('')}
+                  </div>
+                  <p>¿Deseas registrar <strong>"${proyectoFormateado}"</strong> de todos modos?</p>
+                </div>
+              `,
+
           icon: 'warning',
           showCancelButton: true,
           confirmButtonText: 'Sí, registrar igual',
           cancelButtonText: 'Cancelar',
         });
-        if (!confirmProyecto.isConfirmed) return;
+
+        if (!confirmProyecto.isConfirmed) {
+          setIsSubmitting(false);
+          return;
+        }
+
+        force = true; // ⚡ Aquí activas el force si el usuario dijo "sí"
       }
-      await agregarProyecto(proyectoFormateado);
-      // Actualiza la cache:
+
+      await agregarProyecto(proyectoFormateado, force);
       const nuevosProyectos = await fetchOpciones('proyectos');
       setProyectosCache(nuevosProyectos);
     }
+
 
     // ✅ 🚀 Si todo OK, recién registra:
     try {

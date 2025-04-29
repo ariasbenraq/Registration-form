@@ -55,7 +55,7 @@ export function calcularDistanciaLevenshtein(a, b) {
 }
 
 // Buscar coincidencias usando Levenshtein con tolerancia (puedes ajustar el 3)
-export function buscarCoincidenciasLevenshtein(lista, valor, tolerancia = 3) {
+export function buscarCoincidenciasLevenshtein(lista, valor, tolerancia = 2) {
   const valorNormalizado = normalizarTexto(valor);
   return lista.filter(item => {
     const itemNormalizado = normalizarTexto(item);
