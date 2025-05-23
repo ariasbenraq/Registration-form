@@ -1,8 +1,49 @@
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Formulario from './components/Formulario';
-import { TableReg } from './components/TableReg';
+import { Sortingtable } from './components/SortingTable';
+import { AnimatePresence, motion } from 'framer-motion';
+import { FilteringTable } from './components/FilteringTable';
 
+const MotionLink = motion(Link);
+
+
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={
+          <motion.div
+            className="formulario-card w-90"
+            style={{ maxWidth: '600px' }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.4 }}
+          >
+            <h4 className="text-center mb-4">Registro de Puertos de Red</h4>
+            <Formulario />
+          </motion.div>
+        } />
+        <Route path="/tabla" element={
+          <motion.div
+            className="tabla-card w-100 px-4"
+            style={{ maxWidth: '1000px' }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.4 }}
+          >
+            <h4 className="text-center mb-4">Tabla de Registro</h4>
+            <FilteringTable />
+          </motion.div>
+        } />
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
 function App() {
   return (
@@ -10,27 +51,14 @@ function App() {
       <div className="app-fondo">
         <div className="d-flex justify-content-center align-items-center min-vh-100 flex-column">
 
-          {/* 🔵 Barra de navegación arriba */}
-          <nav className="mb-4">
+          {/* 🔵 Barra de navegación */}
+          <nav className="mb-4 mt-4">
             <Link to="/" className="btn btn-primary me-2">Formulario</Link>
             <Link to="/tabla" className="btn btn-primary me-2">Tabla</Link>
           </nav>
 
-          {/* 🟢 Mostrar Formulario con formato de tarjeta centrada */}
-          <Routes>
-            <Route path="/" element={
-              <div className="formulario-card w-90" style={{ maxWidth: '600px' }}>
-                <h4 className="text-center mb-4">Registro de Puertos de Red</h4>
-                <Formulario />
-              </div>
-            } />
-            <Route path="/tabla" element={
-              <div className="tabla-card w-100 px-4" style={{ maxWidth: '1000px' }}>
-                <h4 className="text-center mb-4">Tabla de Registro</h4>
-                <TableReg />
-              </div>
-            } />
-          </Routes>
+          {/* 🧭 Transición entre vistas */}
+          <AnimatedRoutes />
         </div>
       </div>
     </Router>

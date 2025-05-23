@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
+  getSortedRowModel,
   flexRender,
 } from "@tanstack/react-table";
 import { useQuery } from "@tanstack/react-query";
@@ -13,7 +14,8 @@ const fetchRegistros = async () => {
   return res.json();
 };
 
-export const TableReg = () => {
+export const Sortingtable = () => {
+  const columns = useMemo(() => COLUMNS, []);
   const { data, isLoading, isError } = useQuery({
     queryKey: ['registros'],
     queryFn: fetchRegistros,
@@ -23,8 +25,10 @@ export const TableReg = () => {
 
   const table = useReactTable({
     data: data || [],
-    columns: COLUMNS,
+    columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {},
   });
 
   if (isLoading) {
@@ -45,8 +49,14 @@ export const TableReg = () => {
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map(header => (
-                <th key={header.id}>
+                <th
+                  key={header.id}
+                  onClick={header.column.getToggleSortingHandler()}
+                  style={{ cursor: 'pointer' }}
+                >
                   {flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.column.getIsSorted() === "asc" ? " ▲" :
+                   header.column.getIsSorted() === "desc" ? " ▼" : ""}
                 </th>
               ))}
             </tr>
