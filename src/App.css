@@ -8,7 +8,7 @@
 
 .formulario-card {
   max-width: 500px;
-  width: 100%;
+  width: 80%;
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
   position: relative;
@@ -16,3 +16,16 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   padding: 1.5rem; /* equivalente a Bootstrap p-4 */
 }
+
+.form-control::placeholder {
+  font-style: italic;
+}
+
+.tabla-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
