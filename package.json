@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "vite --mode development",
+    "build": "vite build --mode production",
+    "preview": "vite preview --mode production",
+    "start:dev": "vite --mode development",
+    "start:prod": "vite preview --mode production"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -14,8 +16,8 @@
     "@tanstack/react-table": "^8.21.3",
     "bootstrap": "^5.3.5",
     "framer-motion": "^12.12.1",
-    "react": "19.2.0-canary-c4676e72-20250520",
-    "react-dom": "19.2.0-canary-c4676e72-20250520",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-router-dom": "^7.5.3",
     "react-select": "^5.10.1",
     "sweetalert2": "^11.19.1"
