@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
+  "dev": "vite --mode development",
+  "build": "vite build --mode production",
+  "preview": "vite preview --mode production",
+  "start:dev": "vite --mode development",
+  "start:prod": "vite preview --mode production"
+},
   "dependencies": {
     "bootstrap": "^5.3.5",
     "react": "^19.0.0",
