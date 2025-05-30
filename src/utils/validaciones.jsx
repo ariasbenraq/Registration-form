@@ -4,11 +4,18 @@ export const validarFormulario = ({ sede, proyecto, puerto, etiqueta }) => {
   if (!puerto.trim()) return { valido: false, mensaje: 'Por favor, ingresa el puerto.' };
   if (!etiqueta.trim()) return { valido: false, mensaje: 'Por favor, ingresa la etiqueta.' };
 
-  const puertoRegex = /^([1-9])0([1-9]|[1-4][0-8])$/;
-  if (!puertoRegex.test(puerto.trim())) {
+  const puertoValido = /^([1-9])([1-9]|[1-3][0-9]|4[0-8])$/;
+  const puertoGrandeValido = /^(10)([1-9]|[1-3][0-9]|4[0-8])$/;
+  const puertoFormateadoValido = /^(10|[1-9])\/([1-9]|[1-3][0-9]|4[0-8])$/;
+
+  if (
+    !puertoValido.test(puerto.trim()) &&
+    !puertoGrandeValido.test(puerto.trim()) &&
+    !puertoFormateadoValido.test(puerto.trim())
+  ) {
     return {
       valido: false,
-      mensaje: 'Puerto inválido. Debe ser como 101 o 3048 (convertido a 1/0/1 o 3/0/48).'
+      mensaje: 'Puerto inválido. Usa 12 (→ 1/2), 1048 (→ 10/48) o directamente 1/1, 10/48.'
     };
   }
 
@@ -44,9 +51,9 @@ export function calcularDistanciaLevenshtein(a, b) {
         matrix[i][j] = matrix[i - 1][j - 1];
       } else {
         matrix[i][j] = Math.min(
-          matrix[i - 1][j - 1] + 1, // sustitución
-          matrix[i][j - 1] + 1,     // inserción
-          matrix[i - 1][j] + 1      // eliminación
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
         );
       }
     }
@@ -54,7 +61,6 @@ export function calcularDistanciaLevenshtein(a, b) {
   return matrix[b.length][a.length];
 }
 
-// Buscar coincidencias usando Levenshtein con tolerancia (puedes ajustar el 3)
 export function buscarCoincidenciasLevenshtein(lista, valor, tolerancia = 2) {
   const valorNormalizado = normalizarTexto(valor);
   return lista.filter(item => {
@@ -64,7 +70,6 @@ export function buscarCoincidenciasLevenshtein(lista, valor, tolerancia = 2) {
   });
 }
 
-// Formatear título (Title Case)
 export function formatearTitulo(texto) {
   return texto
     .toLowerCase()
@@ -74,16 +79,25 @@ export function formatearTitulo(texto) {
     .join(' ');
 }
 
-// ✅ Agrega esto en utils/validaciones.js:
-
 export const formatearDatos = ({ sede, proyecto, puerto, etiqueta }) => {
-  const stack = puerto[0];
-  const interfaz = puerto.slice(2);
+  let puertoFormateado = puerto.trim();
+
+  if (!puerto.includes('/')) {
+    if (/^([1-9])([0-9]{1,2})$/.test(puerto)) {
+      const sw = puerto[0];
+      const pto = puerto.slice(1);
+      puertoFormateado = `${sw}/${pto}`;
+    }
+    if (/^10([0-9]{1,2})$/.test(puerto)) {
+      const pto = puerto.slice(2);
+      puertoFormateado = `10/${pto}`;
+    }
+  }
+
   return {
     sede: sede.trim(),
     proyecto: proyecto.trim(),
-    puerto: `${stack}/0/${interfaz}`,
+    puerto: puertoFormateado,
     etiqueta: etiqueta.replace(/\s+/g, '').toUpperCase(),
   };
 };
-

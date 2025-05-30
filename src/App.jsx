@@ -4,6 +4,7 @@ import Formulario from './components/Formulario';
 import { Sortingtable } from './components/SortingTable';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FilteringTable } from './components/FilteringTable';
+import { PaginationTable } from './components/PaginationTable';
 
 const MotionLink = motion(Link);
 
@@ -29,7 +30,7 @@ function AnimatedRoutes() {
         } />
         <Route path="/tabla" element={
           <motion.div
-            className="tabla-card w-100 px-4"
+            className="tabla-card w-100 px-4 mb-5"
             style={{ maxWidth: '1000px' }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -37,7 +38,7 @@ function AnimatedRoutes() {
             transition={{ duration: 0.4 }}
           >
             <h4 className="text-center mb-4">Tabla de Registro</h4>
-            <FilteringTable />
+            <PaginationTable />
           </motion.div>
         } />
       </Routes>
