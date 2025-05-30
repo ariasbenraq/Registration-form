@@ -1,152 +1,69 @@
-import { useState } from 'react';
 import './App.css';
-import Swal from 'sweetalert2';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import Formulario from './components/Formulario';
+import { Sortingtable } from './components/SortingTable';
+import { AnimatePresence, motion } from 'framer-motion';
+import { FilteringTable } from './components/FilteringTable';
+import { PaginationTable } from './components/PaginationTable';
+
+const MotionLink = motion(Link);
 
 
-function App() {
-  const [formData, setFormData] = useState({
-    sede: '',
-    proyecto: '',
-    puerto: '',
-    etiqueta: '',
-  });
-
-  const [mensaje, setMensaje] = useState('');
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    let { sede, proyecto, puerto, etiqueta } = formData;
-
-    // Limpiar espacios al inicio y fin
-    sede = sede.trim();
-    proyecto = proyecto.trim();
-    puerto = puerto.trim();
-    etiqueta = etiqueta.replace(/\s+/g, '').toUpperCase(); // Eliminar TODOS los espacios y convertir a mayúsculas
-
-    // Validación específica por campo
-    if (!sede.trim()) {
-      return Swal.fire('Campo requerido', 'Por favor, ingresa una sede.', 'warning');
-    }
-
-    if (!proyecto.trim()) {
-      return Swal.fire('Campo requerido', 'Por favor, ingresa un proyecto.', 'warning');
-    }
-
-    if (!puerto.trim()) {
-      return Swal.fire('Campo requerido', 'Por favor, ingresa el puerto del switch.', 'warning');
-    }
-
-    if (!etiqueta.trim()) {
-      return Swal.fire('Campo requerido', 'Por favor, ingresa una etiqueta de faceplate.', 'warning');
-    }
-
-    // Validar Puerto del Switch: Ejemplo válido 101 → 1/0/1
-    const puertoRegex = /^([1-9])0([1-9]|[1-4][0-8])$/;
-    if (!puertoRegex.test(puerto)) {
-      return Swal.fire(
-        'Formato de Puerto inválido',
-        'Debe ser una combinación como 101 o 3048, que se transformará en 1/0/1 o 3/0/48.',
-        'error'
-      );
-    }
-
-    // Validar etiqueta Faceplate (solo letras, números y puntos)
-    const etiquetaValida = /^[A-Z0-9.]+$/;
-    if (!etiquetaValida.test(etiqueta)) {
-      return Swal.fire(
-        'Etiqueta inválida',
-        'La etiqueta solo debe contener letras, números o puntos.',
-        'error'
-      );
-    }
-
-    // Transformar puerto: 3048 → 3/0/48
-    const stack = puerto[0];
-    const interfaz = puerto.slice(2);
-    const puertoFormateado = `${stack}/0/${interfaz}`;
-
-    const datosFinales = {
-      sede,
-      proyecto,
-      puerto: puertoFormateado,
-      etiqueta
-    };
-
-    try {
-      const confirmacion = await Swal.fire({
-        title: '¿Estás seguro?',
-        html: `
-          <p><strong>Sede:</strong> ${sede}</p>
-          <p><strong>Proyecto:</strong> ${proyecto}</p>
-          <p><strong>Puerto:</strong> ${puertoFormateado}</p>
-          <p><strong>Etiqueta:</strong> ${etiqueta}</p>
-          <p class="text-muted">Confirma que los datos son correctos antes de enviarlos.</p>
-        `,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, enviar',
-        cancelButtonText: 'Cancelar',
-      });
-
-      if (!confirmacion.isConfirmed) return;
-
-      await fetch('https://script.google.com/macros/s/AKfycbxE9wKVihifygcycSoaCWT02EnRKwWRPiNqQMXyKgiHR7h8qBu7dCwfGSZHEu_TOeFi6A/exec', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosFinales),
-      });
-
-      Swal.fire('¡Éxito!', 'La información fue registrada correctamente.', 'success');
-      setFormData({ sede: '', proyecto: '', puerto: '', etiqueta: '' });
-    } catch (error) {
-      console.error(error);
-      Swal.fire('Error', 'Ocurrió un error al enviar los datos.', 'error');
-    }
-
-  };
-
-
+function AnimatedRoutes() {
+  const location = useLocation();
 
   return (
-    <div className='app-fondo'>
-      <div className="d-flex justify-content-center align-items-center min-vh-100">
-        <div className="formulario-card">
-          <h4 className="text-center mb-4">Registro de Puertos de Red</h4>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label">Sede</label>
-              <input type="text" name="sede" className="form-control" value={formData.sede} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Proyecto</label>
-              <input type="text" name="proyecto" className="form-control" value={formData.proyecto} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Puerto del Switch</label>
-              <input type="text" name="puerto" className="form-control" value={formData.puerto} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Etiqueta del Faceplate</label>
-              <input type="text" name="etiqueta" className="form-control" value={formData.etiqueta} onChange={handleChange} />
-            </div>
-            <button type="submit" className="btn btn-primary w-100">Enviar</button>
-          </form>
-          {mensaje && <p className="mt-3 alert alert-info">{mensaje}</p>}
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={
+          <motion.div
+            className="formulario-card w-90"
+            style={{ maxWidth: '600px' }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.4 }}
+          >
+            <h4 className="text-center mb-4">Registro de Puertos de Red</h4>
+            <Formulario />
+          </motion.div>
+        } />
+        <Route path="/tabla" element={
+          <motion.div
+            className="tabla-card w-100 px-4 mb-5"
+            style={{ maxWidth: '1000px' }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.4 }}
+          >
+            <h4 className="text-center mb-4">Tabla de Registro</h4>
+            <PaginationTable />
+          </motion.div>
+        } />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <div className="app-fondo">
+        <div className="d-flex justify-content-center align-items-center min-vh-100 flex-column">
+
+          {/* 🔵 Barra de navegación */}
+          <nav className="mb-4 mt-4">
+            <Link to="/" className="btn btn-primary me-2">Formulario</Link>
+            <Link to="/tabla" className="btn btn-primary me-2">Tabla</Link>
+          </nav>
+
+          {/* 🧭 Transición entre vistas */}
+          <AnimatedRoutes />
         </div>
       </div>
-    </div>
+    </Router>
   );
-
 }
 
 export default App;
