@@ -1,13 +1,27 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow-x: hidden;
+}
+
+
 .app-fondo {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e0eafc, #cfdef3); /* azul claro suave */
+  width: 100%;
+  background: linear-gradient(135deg, #e0eafc, #cfdef3);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed; /* para efecto elegante */
+  background-position: center;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+
 .formulario-card {
-  max-width: 500px;
+  max-width: 900px;
   width: 80%;
   background-color: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
@@ -28,4 +42,61 @@
   padding: 1.5rem;
   overflow-x: auto;
 }
+
+/* Nuevo estilo solo para el contenedor de la tabla */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.table-responsive-scroll table {
+  min-width: 800px; /* o lo que necesites según tus columnas */
+}
+
+/* Para móviles */
+@media (max-width: 576px) {
+  .tabla-card {
+    padding: 0.5rem;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .tabla-card h4 {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .table-responsive-scroll table {
+    min-width: 600px; /* O ajusta al mínimo requerido para no cortar columnas */
+  }
+}
+
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.85rem;
+  }
+
+  th,
+  td {
+    white-space: nowrap;
+  }
+}
+
+.table-responsive {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  white-space: nowrap;
+}
+
 

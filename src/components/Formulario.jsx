@@ -229,46 +229,31 @@ const Formulario = () => {
 
       {/* <h5 className="mt-4">Puertos y Etiquetas</h5> */}
       <div className='row'>
-        <div className="col-md-6 mb-3">
+        <div className="col-md-6 mb-4">
           <label className="form-label">Puerto del Switch</label>
           <input
             type="text"
             name="puerto"
             className="form-control"
-            placeholder="ej. 101"
+            placeholder="ej. 101 o  3048"
             value={formData.puerto}
             onChange={handleChange}
             refresh={refreshCounter}
           />
         </div>
-        <div className="col-md-6 mb-3">
-          <label className="form-label">Etiqueta del Faceplate</label>
+        <div className="col-md-6 mb-4">
+          <label className="form-label">Etiqueta</label>
           <input
             type="text"
             name="etiqueta"
             className="form-control"
-            placeholder="ej. ppa18"
+            placeholder="ej. ppa18 o 3c-50d"
             value={formData.etiqueta}
             onChange={handleChange}
             refresh={refreshCounter}
           />
         </div>
       </div>
-      {/*       
-      {pares.map((pair, index) => (
-        <PuertoEtiquetaGroup
-          key={index}
-          index={index}
-          pair={pair}
-          handlePairChange={handlePairChange}
-          handleRemove={handleRemovePair}
-        />
-      ))} */}
-      {/* <div className="col-md-6 mb-3">
-        <button type="button" className="btn btn-secondary" onClick={handleAddPair}>
-          ➕ Agregar otro par de Puerto y Etiqueta
-        </button>
-      </div> */}
       <SubmitButton isSubmitting={isSubmitting} />
     </form>
   );
