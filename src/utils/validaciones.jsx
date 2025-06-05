@@ -4,22 +4,20 @@ export const validarFormulario = ({ sede, proyecto, puerto, etiqueta }) => {
   if (!puerto.trim()) return { valido: false, mensaje: 'Por favor, ingresa el puerto.' };
   if (!etiqueta.trim()) return { valido: false, mensaje: 'Por favor, ingresa la etiqueta.' };
 
-  const puertoValido = /^([1-9])([1-9]|[1-3][0-9]|4[0-8])$/;
-  const puertoGrandeValido = /^(10)([1-9]|[1-3][0-9]|4[0-8])$/;
-  const puertoFormateadoValido = /^(10|[1-9])\/([1-9]|[1-3][0-9]|4[0-8])$/;
+  const puertoValidoNumerico = /^(10|[1-9])0([1-9]|[1-3][0-9]|4[0-8])$/;
+  const puertoFormateadoValido = /^([1-9]|10)\/0\/([1-9]|[1-3][0-9]|4[0-8])$/;
 
   if (
-    !puertoValido.test(puerto.trim()) &&
-    !puertoGrandeValido.test(puerto.trim()) &&
+    !puertoValidoNumerico.test(puerto.trim()) &&
     !puertoFormateadoValido.test(puerto.trim())
   ) {
     return {
       valido: false,
-      mensaje: 'Puerto inválido. Usa 12 (→ 1/2), 1048 (→ 10/48) o directamente 1/1, 10/48.'
+      mensaje: 'Puerto inválido. Usa por ejemplo: 101 (→ 1/0/1) hasta 10048 (→ 10/0/48), o directamente 1/0/1, 10/0/48.'
     };
   }
 
-  const etiquetaValida = /^[A-Z0-9.]+$/;
+  const etiquetaValida = /^[A-Z0-9.-]+$/;
   const etiquetaFormateada = etiqueta.replace(/\s+/g, '').toUpperCase();
   if (!etiquetaValida.test(etiquetaFormateada)) {
     return {
@@ -82,15 +80,13 @@ export function formatearTitulo(texto) {
 export const formatearDatos = ({ sede, proyecto, puerto, etiqueta }) => {
   let puertoFormateado = puerto.trim();
 
-  if (!puerto.includes('/')) {
-    if (/^([1-9])([0-9]{1,2})$/.test(puerto)) {
-      const sw = puerto[0];
-      const pto = puerto.slice(1);
-      puertoFormateado = `${sw}/${pto}`;
-    }
-    if (/^10([0-9]{1,2})$/.test(puerto)) {
-      const pto = puerto.slice(2);
-      puertoFormateado = `10/${pto}`;
+  // Si es numérico entre 101 y 10048
+  if (/^(10|[1-9])0([1-9]|[1-3][0-9]|4[0-8])$/.test(puertoFormateado)) {
+    const match = puertoFormateado.match(/^(\d{1,2})0(\d{1,2})$/); // Ej: 105 → ['105', '1', '5']
+    if (match) {
+      const bloque = match[1];       // '1', '2', ..., '10'
+      const subpuerto = match[2];    // '1' a '48'
+      puertoFormateado = `${bloque}/0/${subpuerto}`;
     }
   }
 
