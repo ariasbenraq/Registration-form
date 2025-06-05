@@ -17,8 +17,8 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={
           <motion.div
-            className="formulario-card w-90"
-            style={{ maxWidth: '600px' }}
+            className="formulario-card w-80"
+            style={{ maxWidth: '900px' }}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -30 }}
