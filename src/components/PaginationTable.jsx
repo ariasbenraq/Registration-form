@@ -12,6 +12,9 @@ import { COLUMNS } from "./columns";
 import { GlobalFilter } from "./GlobalFilter";
 import { BASE_URL } from "../services/apiService";
 import { motion } from 'framer-motion';
+import Paginacion from "./Paginacion";
+
+
 
 const fetchRegistros = async () => {
     const res = await fetch(`${BASE_URL}/registro`);
@@ -87,103 +90,110 @@ export const PaginationTable = () => {
 
 
     return (
+        <>
+            {/* 📱 Versión escritorio */}
+            <div className="d-none d-md-block ">
 
-        <div className="container-fluid px-2">
-            {/* 🔎 Filtro global */}
-            <div className="mb-3">
-                <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+                {/* 🔎 Filtro global */}
+                <div className="mb-4">
+                    <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+                </div>
+
+                {/* 🧾 Contenedor de tabla responsiva */}
+                <div className="table-responsive ">
+                    <table className="table table-bordered  table-hover table-striped align-middle text-center ">
+                        <thead className="table-light">
+                            {table.getHeaderGroups().map(headerGroup => (
+                                <tr key={headerGroup.id}>
+                                    {headerGroup.headers.map(header => (
+                                        <th
+                                            key={header.id}
+                                            onClick={header.column.getToggleSortingHandler()}
+                                            className="border border-gray-300 dark:border-gray-600"
+                                        >
+                                            {flexRender(header.column.columnDef.header, header.getContext())}
+                                            {header.column.getIsSorted() === "asc" ? " ▲" :
+                                                header.column.getIsSorted() === "desc" ? " ▼" : ""}
+                                        </th>
+                                    ))}
+                                </tr>
+                            ))}
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {table.getRowModel().rows.map(row => (
+                                <tr key={row.id} className="hover:bg-gray-100 even:bg-gray-50">
+                                    {row.getVisibleCells().map(cell => (
+                                        <td key={cell.id} className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                <Paginacion
+                    pageCount={table.getPageCount()}
+                    pageIndex={table.getState().pagination.pageIndex}
+                    canPreviousPage={table.getCanPreviousPage()}
+                    canNextPage={table.getCanNextPage()}
+                    previousPage={() => table.previousPage()}
+                    nextPage={() => table.nextPage()}
+                    gotoPage={(page) => table.setPageIndex(page)}
+                    pageSize={table.getState().pagination.pageSize}
+                    setPageSize={table.setPageSize}
+                    rowCount={table.getFilteredRowModel().rows.length}
+                ></Paginacion>
+
             </div>
 
-            {/* 🧾 Contenedor de tabla responsiva */}
-            <div className="row justify-content-center">
-                <div className="col-12">
-                    <div
-                        className="table-responsive"
-                        style={{
-                            overflowX: 'auto',
-                            WebkitOverflowScrolling: 'touch',
-                        }}
-                    >
-                        <table
-                            className="table table-striped table-bordered align-middle text-nowrap"
-                            style={{ minWidth: '800px' }} // Ajusta según tus columnas
-                        >
-                            <thead>
-                                {table.getHeaderGroups().map(headerGroup => (
-                                    <tr key={headerGroup.id}>
-                                        {headerGroup.headers.map(header => (
-                                            <th
-                                                key={header.id}
-                                                onClick={header.column.getToggleSortingHandler()}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                {flexRender(header.column.columnDef.header, header.getContext())}
-                                                {header.column.getIsSorted() === "asc" ? " ▲" :
-                                                    header.column.getIsSorted() === "desc" ? " ▼" : ""}
-                                            </th>
-                                        ))}
-                                    </tr>
+            {/* 📱 Versión móvil como tarjetas */}
+            <div className="d-block d-md-none px-3">
+                {/* 🔎 Filtro global */}
+                <div className="mb-4 d-flex">
+                    <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+                </div>
+                <Paginacion
+                    pageCount={table.getPageCount()}
+                    pageIndex={table.getState().pagination.pageIndex}
+                    canPreviousPage={table.getCanPreviousPage()}
+                    canNextPage={table.getCanNextPage()}
+                    previousPage={() => table.previousPage()}
+                    nextPage={() => table.nextPage()}
+                    gotoPage={(page) => table.setPageIndex(page)}
+                    pageSize={table.getState().pagination.pageSize}
+                    setPageSize={table.setPageSize}
+                    rowCount={table.getFilteredRowModel().rows.length}
+                ></Paginacion>
+                {table.getRowModel().rows.map((row) => (
+                    <div key={row.id} className="card mb-3 shadow p-3">
+                        <div className="card-body p-">
+                            <h6 className="card-title mb-2"></h6>
+                            <ul className="list-unstyled mb-0 small">
+                                {row.getVisibleCells().map(cell => (
+                                    <li key={cell.id}>
+                                        <strong>{cell.column.columnDef.header}:</strong>{" "}
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </li>
                                 ))}
-                            </thead>
-                            <tbody>
-                                {table.getRowModel().rows.map(row => (
-                                    <tr key={row.id}>
-                                        {row.getVisibleCells().map(cell => (
-                                            <td key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                            </ul>
+                        </div>
                     </div>
-                </div>
+                ))}
+                <Paginacion
+                    pageCount={table.getPageCount()}
+                    pageIndex={table.getState().pagination.pageIndex}
+                    canPreviousPage={table.getCanPreviousPage()}
+                    canNextPage={table.getCanNextPage()}
+                    previousPage={() => table.previousPage()}
+                    nextPage={() => table.nextPage()}
+                    gotoPage={(page) => table.setPageIndex(page)}
+                    pageSize={table.getState().pagination.pageSize}
+                    setPageSize={table.setPageSize}
+                    rowCount={table.getFilteredRowModel().rows.length}
+                ></Paginacion>
             </div>
-
-            {/* 📘 Paginación Bootstrap */}
-            <div className="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                <div>
-                    <span>
-                        Página <strong>{table.getState().pagination.pageIndex + 1}</strong> de{" "}
-                        <strong>{table.getPageCount()}</strong>
-                    </span>
-                </div>
-
-                <div className="btn-group">
-                    <button
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        Anterior
-                    </button>
-                    <button
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        Siguiente
-                    </button>
-                </div>
-
-                <div className="d-flex align-items-center">
-                    <label className="me-2">Filas por página:</label>
-                    <select
-                        className="form-select form-select-sm"
-                        style={{ width: "auto" }}
-                        value={table.getState().pagination.pageSize}
-                        onChange={(e) => table.setPageSize(Number(e.target.value))}
-                    >
-                        {[5, 10, 20, 50].map((pageSize) => (
-                            <option key={pageSize} value={pageSize}>
-                                {pageSize}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-        </div>
-
+        </>
     );
 };

@@ -29,14 +29,12 @@ function AnimatedRoutes() {
           </motion.div>
         } />
         <Route path="/tabla" element={
-          <motion.div
-            className="tabla-card w-100 px-4 mb-5"
-            style={{ maxWidth: '1000px' }}
+          <motion.div className="tabla-card"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -30 }}
-            transition={{ duration: 0.4 }}
-          >
+            transition={{ duration: 0.4 }}>
+
             <h4 className="text-center mb-4">Tabla de Registro</h4>
             <PaginationTable />
           </motion.div>

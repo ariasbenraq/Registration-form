@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 html, body {
   margin: 0;
   padding: 0;
@@ -44,7 +46,7 @@ html, body {
 }
 
 /* Nuevo estilo solo para el contenedor de la tabla */
-.table-wrapper {
+/* .table-wrapper {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -57,11 +59,10 @@ html, body {
 }
 
 .table-responsive-scroll table {
-  min-width: 800px; /* o lo que necesites según tus columnas */
-}
+  min-width: 800px;  */
 
 /* Para móviles */
-@media (max-width: 576px) {
+/* @media (max-width: 576px) {
   .tabla-card {
     padding: 0.5rem;
     border-radius: 0;
@@ -74,11 +75,11 @@ html, body {
   }
 
   .table-responsive-scroll table {
-    min-width: 600px; /* O ajusta al mínimo requerido para no cortar columnas */
+    min-width: 600px; 
   }
-}
+} */
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .table {
     font-size: 0.85rem;
   }
@@ -97,6 +98,6 @@ html, body {
 .table {
   width: 100%;
   white-space: nowrap;
-}
+} */
 
 

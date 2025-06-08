@@ -7,7 +7,7 @@ export const GlobalFilter = ({ filter, setFilter }) => {
         <input
           value={filter || ""}
           onChange={(e) => setFilter(e.target.value)}
-          className="form-control d-inline-block w-auto"
+          className="form-control d-inline-block w-auto shadow"
           placeholder="Escribe para filtrar..."
         />
       </span>
