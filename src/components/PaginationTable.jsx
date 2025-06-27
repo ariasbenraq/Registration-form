@@ -101,7 +101,7 @@ export const PaginationTable = () => {
 
                 {/* 🧾 Contenedor de tabla responsiva */}
                 <div className="table-responsive ">
-                    <table className="table table-bordered  table-hover table-striped align-middle text-center ">
+                    <table className="table table-sm table-bordered table-hover table-striped text-center align-middle compact-table">
                         <thead className="table-light">
                             {table.getHeaderGroups().map(headerGroup => (
                                 <tr key={headerGroup.id}>
@@ -123,7 +123,7 @@ export const PaginationTable = () => {
                             {table.getRowModel().rows.map(row => (
                                 <tr key={row.id} className="hover:bg-gray-100 even:bg-gray-50">
                                     {row.getVisibleCells().map(cell => (
-                                        <td key={cell.id} className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                                        <td key={cell.id} style={{ padding: '6px 8px', fontSize: '0.85rem', verticalAlign: 'middle' }}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </td>
                                     ))}
