@@ -4,7 +4,8 @@ import Formulario from './components/Formulario';
 import { Sortingtable } from './components/SortingTable';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FilteringTable } from './components/FilteringTable';
-import { PaginationTable } from './components/PaginationTable';
+import TableReg from './components/TableReg';
+
 
 const MotionLink = motion(Link);
 
@@ -38,7 +39,7 @@ function AnimatedRoutes() {
             transition={{ duration: 0.4 }}
           >
             <h4 className="text-center mb-4">Tabla de Registro</h4>
-            <PaginationTable />
+            <TableReg />
           </motion.div>
         } />
       </Routes>
