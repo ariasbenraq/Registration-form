@@ -12,6 +12,7 @@ import { COLUMNS } from "./columns";
 import { GlobalFilter } from "./GlobalFilter";
 import { BASE_URL } from "../services/apiService";
 import { motion } from 'framer-motion';
+import PaginacionAvanzada from "./PaginacionAvanzada"; // ajusta la ruta si es necesario
 
 const fetchRegistros = async () => {
     const res = await fetch(`${BASE_URL}/registro`);
@@ -34,13 +35,13 @@ export const PaginationTable = () => {
         data: data || [],
         columns,
         state: {
-            globalFilter
+            globalFilter,
         },
         onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel()
+        getPaginationRowModel: getPaginationRowModel(),
     });
 
     if (isLoading) {
@@ -150,22 +151,10 @@ export const PaginationTable = () => {
                     </span>
                 </div>
 
-                <div className="btn-group">
-                    <button
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        Anterior
-                    </button>
-                    <button
-                        className="btn btn-outline-primary btn-sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        Siguiente
-                    </button>
-                </div>
+
+                <PaginacionAvanzada table={table} />
+
+                
 
                 <div className="d-flex align-items-center">
                     <label className="me-2">Filas por página:</label>
