@@ -4,7 +4,8 @@ import Formulario from './components/Formulario';
 import { Sortingtable } from './components/SortingTable';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FilteringTable } from './components/FilteringTable';
-import TableReg from './components/TableReg';
+import { TableReg } from './components/TableReg';
+
 
 
 const MotionLink = motion(Link);

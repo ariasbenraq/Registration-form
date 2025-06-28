@@ -20,7 +20,7 @@ const fetchRegistros = async () => {
     return res.json();
 };
 
-export const PaginationTable = () => {
+export const TableReg = () => {
     const columns = useMemo(() => COLUMNS, []);
     const [globalFilter, setGlobalFilter] = useState('');
 
