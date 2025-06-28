@@ -42,6 +42,11 @@ export const TableReg = () => {
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        initialState: {
+            pagination: {
+                pageSize: 5, // Cambia este valor según tus necesidades
+            },
+        },
     });
 
     if (isLoading) {
@@ -154,7 +159,6 @@ export const TableReg = () => {
 
                 <PaginacionAvanzada table={table} />
 
-                
 
                 <div className="d-flex align-items-center">
                     <label className="me-2">Filas por página:</label>

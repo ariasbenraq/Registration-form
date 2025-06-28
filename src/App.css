@@ -99,4 +99,9 @@ html, body {
   white-space: nowrap;
 }
 
+.contenedor-principal {
+  padding-top: 60px; /* Ajusta este valor según el alto real de tu navbar */
+}
+
+
 
