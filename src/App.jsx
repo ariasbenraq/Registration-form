@@ -35,7 +35,7 @@ function AnimatedRoutes() {
               exit={{ opacity: 0, y: -30 }}
               transition={{ duration: 0.4 }}
             >
-              <h4 className="text-center mb-4">Tabla de Registro</h4>
+              <h4 className="text-center mb-3">Tabla de Registro</h4>
               <TableReg />
             </motion.div>
           } />
