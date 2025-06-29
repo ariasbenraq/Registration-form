@@ -28,7 +28,7 @@ function AnimatedRoutes() {
           } />
           <Route path="/tabla" element={
             <motion.div
-              className="tabla-card w-100 px-4 mb-5"
+              className="tabla-card w-100 px-4 mb-5 mt-5"
               style={{ maxWidth: '1000px' }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}

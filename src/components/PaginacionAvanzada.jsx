@@ -65,7 +65,7 @@ const PaginacionAvanzada = ({ table }) => {
   );
 
   return (
-    <Pagination size="sm" className="mb-0">
+    <Pagination size="sm" className="mb-0 d-flex justify-content-center">
       {items}
     </Pagination>
   );

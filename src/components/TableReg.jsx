@@ -13,6 +13,7 @@ import { GlobalFilter } from "./GlobalFilter";
 import { BASE_URL } from "../services/apiService";
 import { motion } from 'framer-motion';
 import PaginacionAvanzada from "./PaginacionAvanzada"; // ajusta la ruta si es necesario
+import TableCardsMobile from './TableCardsMobile';
 
 const fetchRegistros = async () => {
     const res = await fetch(`${BASE_URL}/registro`);
@@ -53,18 +54,11 @@ export const TableReg = () => {
         return (
             <div className="d-flex flex-column justify-content-center align-items-center mt-5">
                 <motion.div
-                    className="spinner-border text-primary"
-                    role="status"
-                    initial={{ scale: 0 }}
-                    animate={{ rotate: 360, scale: 1 }}
-                    transition={{ duration: 0.8, ease: 'easeInOut', repeat: Infinity }}
-                    style={{ width: '3rem', height: '3rem' }}
+                    className="spinner-border text-dark"
                 />
                 <motion.p
-                    className="mt-3 text-primary"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
+                    className="mt-3 text-dark"
+                    
                 >
                     Cargando registros...
                 </motion.p>
@@ -93,90 +87,98 @@ export const TableReg = () => {
 
 
     return (
+        <>
+            <div className="d-none d-md-block">
+                {/* 🔎 Filtro global */}
+                <div className="mb-3">
+                    <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+                </div>
 
-        <div className="container-fluid px-2">
-            {/* 🔎 Filtro global */}
-            <div className="mb-3">
-                <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
-            </div>
-
-            {/* 🧾 Contenedor de tabla responsiva */}
-            <div className="row justify-content-center">
-                <div className="col-12">
-                    <div
-                        className="table-responsive"
-                        style={{
-                            overflowX: 'auto',
-                            WebkitOverflowScrolling: 'touch',
-                        }}
-                    >
-                        <table
-                            className="table table-striped table-bordered align-middle text-nowrap"
-                            style={{ minWidth: '800px' }} // Ajusta según tus columnas
+                {/* 🧾 Contenedor de tabla responsiva */}
+                <div className="row justify-content-center">
+                    <div className="col-12">
+                        <div
+                            className="table-responsive"
+                            style={{
+                                overflowX: 'auto',
+                                WebkitOverflowScrolling: 'touch',
+                            }}
                         >
-                            <thead>
-                                {table.getHeaderGroups().map(headerGroup => (
-                                    <tr key={headerGroup.id}>
-                                        {headerGroup.headers.map(header => (
-                                            <th
-                                                key={header.id}
-                                                onClick={header.column.getToggleSortingHandler()}
-                                                style={{ cursor: 'pointer' }}
-                                            >
-                                                {flexRender(header.column.columnDef.header, header.getContext())}
-                                                {header.column.getIsSorted() === "asc" ? " ▲" :
-                                                    header.column.getIsSorted() === "desc" ? " ▼" : ""}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </thead>
-                            <tbody>
-                                {table.getRowModel().rows.map(row => (
-                                    <tr key={row.id}>
-                                        {row.getVisibleCells().map(cell => (
-                                            <td key={cell.id}>
-                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                            <table
+                                className="table table-striped table-bordered align-middle text-nowrap"
+                                style={{ minWidth: '800px' }} // Ajusta según tus columnas
+                            >
+                                <thead>
+                                    {table.getHeaderGroups().map(headerGroup => (
+                                        <tr key={headerGroup.id}>
+                                            {headerGroup.headers.map(header => (
+                                                <th
+                                                    key={header.id}
+                                                    onClick={header.column.getToggleSortingHandler()}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
+                                                    {flexRender(header.column.columnDef.header, header.getContext())}
+                                                    {header.column.getIsSorted() === "asc" ? " ▲" :
+                                                        header.column.getIsSorted() === "desc" ? " ▼" : ""}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </thead>
+                                <tbody>
+                                    {table.getRowModel().rows.map(row => (
+                                        <tr key={row.id}>
+                                            {row.getVisibleCells().map(cell => (
+                                                <td key={cell.id}>
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 📘 Paginación Bootstrap */}
+                <div className="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                    <div>
+                        <span>
+                            Página <strong>{table.getState().pagination.pageIndex + 1}</strong> de{" "}
+                            <strong>{table.getPageCount()}</strong>
+                        </span>
+                    </div>
+
+
+                    <PaginacionAvanzada table={table} />
+
+
+                    <div className="d-flex align-items-center">
+                        <label className="me-2">Filas por página:</label>
+                        <select
+                            className="form-select form-select-sm"
+                            style={{ width: "auto" }}
+                            value={table.getState().pagination.pageSize}
+                            onChange={(e) => table.setPageSize(Number(e.target.value))}
+                        >
+                            {[5, 10, 20, 50].map((pageSize) => (
+                                <option key={pageSize} value={pageSize}>
+                                    {pageSize}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </div>
-
-            {/* 📘 Paginación Bootstrap */}
-            <div className="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                <div>
-                    <span>
-                        Página <strong>{table.getState().pagination.pageIndex + 1}</strong> de{" "}
-                        <strong>{table.getPageCount()}</strong>
-                    </span>
+            {/* 📱 Vista móvil */}
+            <div className="d-block d-md-nonetabla-card  bg-white py-3 px-2">
+                <div className="d-flex justify-content-center mb-3">
+                    <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                 </div>
-
-
+                <TableCardsMobile table={table} />
                 <PaginacionAvanzada table={table} />
-
-
-                <div className="d-flex align-items-center">
-                    <label className="me-2">Filas por página:</label>
-                    <select
-                        className="form-select form-select-sm"
-                        style={{ width: "auto" }}
-                        value={table.getState().pagination.pageSize}
-                        onChange={(e) => table.setPageSize(Number(e.target.value))}
-                    >
-                        {[5, 10, 20, 50].map((pageSize) => (
-                            <option key={pageSize} value={pageSize}>
-                                {pageSize}
-                            </option>
-                        ))}
-                    </select>
-                </div>
             </div>
-        </div>
-
+        </>
     );
 };

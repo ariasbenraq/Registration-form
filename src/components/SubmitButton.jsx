@@ -5,7 +5,7 @@ const SubmitButton = ({ isSubmitting, text = "Enviar", pendingText = "Enviando..
   return (
     <button
       type="submit"
-      className="btn btn-primary w-100 d-flex align-items-center justify-content-center"
+      className="btn btn-dark w-100 d-flex align-items-center justify-content-center"
       disabled={isSubmitting}
       style={{ height: '45px' }}
     >

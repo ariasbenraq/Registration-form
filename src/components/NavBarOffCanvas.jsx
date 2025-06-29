@@ -12,7 +12,7 @@ const NavBarOffCanvas = () => {
   const expand = 'md';
 
   return (
-    <Navbar key={expand} expand={expand} className="bg-primary fixed-top shadow-sm" data-bs-theme="dark">
+    <Navbar key={expand} expand={expand} className="bg-body-tertiary fixed-top shadow-sm" data-bs-theme="dark">
       <Container fluid>
         <Navbar.Brand as={Link} to="/">Red Manager</Navbar.Brand>
         <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
