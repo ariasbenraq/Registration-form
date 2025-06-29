@@ -172,7 +172,7 @@ export const TableReg = () => {
                 </div>
             </div>
             {/* 📱 Vista móvil */}
-            <div className="d-block d-md-nonetabla-card  bg-white py-3 px-2">
+            <div className="d-block d-md-none tabla-card  bg-white py-3 px-2">
                 <div className="d-flex justify-content-center mb-3">
                     <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                 </div>
