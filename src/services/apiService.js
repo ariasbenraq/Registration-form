@@ -51,3 +51,22 @@ export async function fetchOpcionesFiltrado(endpoint, query) {
   const data = await res.json();
   return data[endpoint];
 }
+
+export async function fetchRegistros() {
+  const res = await fetch(`${BASE_URL}/registro`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true'
+    }
+  });
+
+  if (!res.ok) {
+    console.error("❌ Error al cargar registros:", res.status);
+    throw new Error("Error al cargar registros");
+  }
+
+  const json = await res.json();
+  return Array.isArray(json) ? json : json.registro || [];
+}
+

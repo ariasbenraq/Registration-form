@@ -14,12 +14,8 @@ import { BASE_URL } from "../services/apiService";
 import { motion } from 'framer-motion';
 import PaginacionAvanzada from "./PaginacionAvanzada"; // ajusta la ruta si es necesario
 import TableCardsMobile from './TableCardsMobile';
+import { fetchRegistros } from '../services/apiService';
 
-const fetchRegistros = async () => {
-    const res = await fetch(`${BASE_URL}/registro`);
-    if (!res.ok) throw new Error("Error al cargar registros");
-    return res.json();
-};
 
 export const TableReg = () => {
     const columns = useMemo(() => COLUMNS, []);
@@ -31,6 +27,8 @@ export const TableReg = () => {
         staleTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false,
     });
+    console.log("📦 Resultado de useQuery:", data);
+    console.log("🧪 ¿Es array?", Array.isArray(data));
 
     const table = useReactTable({
         data: data || [],
@@ -58,7 +56,7 @@ export const TableReg = () => {
                 />
                 <motion.p
                     className="mt-3 text-dark"
-                    
+
                 >
                     Cargando registros...
                 </motion.p>
