@@ -63,10 +63,14 @@ html, body {
 /* Para móviles */
 @media (max-width: 576px) {
   .tabla-card {
-    padding: 0.5rem;
-    border-radius: 0;
+    width: 100%;
+    max-width: 100%; /* usa todo el ancho posible */
+    padding: 1rem;
+    margin: 0 auto;
+    border-radius: 20px;
     box-shadow: none;
   }
+}
 
   .tabla-card h4 {
     font-size: 1.2rem;
@@ -76,7 +80,7 @@ html, body {
   .table-responsive-scroll table {
     min-width: 600px; /* O ajusta al mínimo requerido para no cortar columnas */
   }
-}
+
 
 @media (max-width: 768px) {
   .table {
@@ -98,5 +102,10 @@ html, body {
   width: 100%;
   white-space: nowrap;
 }
+
+.contenedor-principal {
+  padding-top: 60px; /* Ajusta este valor según el alto real de tu navbar */
+}
+
 
 
