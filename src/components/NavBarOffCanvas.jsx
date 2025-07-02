@@ -29,7 +29,7 @@ const NavBarOffCanvas = () => {
           aria-labelledby={`offcanvasNavbarLabel-expand-${expand}`}
           placement="end"
           show={show}
-          onHide={() => setShow(true)}
+          onHide={() => setShow(false)}
         >
           <Offcanvas.Header closeButton>
             <Offcanvas.Title id={`offcanvasNavbarLabel-expand-${expand}`}>
